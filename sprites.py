@@ -51,12 +51,24 @@ class Player(pygame.sprite.Sprite):
 
     def load_images(self):
         """Function to load all of froggers images."""
-        self.down_frames = [self.game.spritesheet.get_image(1, 30, 52, 36),
-                            self.game.spritesheet.get_image(54, 28, 57, 36),
-                            self.game.spritesheet.get_image(113, 19, 56, 51),
-                            self.game.spritesheet.get_image(173, 9, 53, 64),
-                            self.game.spritesheet.get_image(230, 2, 54, 73),
-                            self.game.spritesheet.get_image(285, 20, 56, 51)
+        self.down_frames = [pygame.transform.scale(
+                                self.game.spritesheet.get_image(1, 30, 52, 36),
+                                (45, 31)),
+                            pygame.transform.scale(
+                                self.game.spritesheet.get_image(54, 28, 57, 36),
+                                (49, 31)),
+                            pygame.transform.scale(
+                                self.game.spritesheet.get_image(113, 19, 56, 51),
+                                (51, 46)),
+                            pygame.transform.scale(
+                                self.game.spritesheet.get_image(173, 9, 53, 64),
+                                (49, 59)),
+                            pygame.transform.scale(
+                                self.game.spritesheet.get_image(230, 2, 54, 73),
+                                (50, 68)),
+                            pygame.transform.scale(
+                                self.game.spritesheet.get_image(285, 20, 56, 51),
+                                (51, 46)),
                             ]
         self.up_frames = []
         self.right_frames = []
@@ -186,26 +198,46 @@ class Home(pygame.sprite.Sprite):
 class Car(pygame.sprite.Sprite):
     """Class to manage cars."""
 
-    def __init__(self, game):
+    def __init__(self, game, lane):
         """Initialize car attributes."""
         self.groups = game.all_sprites, game.cars
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.lane = lane
+        # set the direction of the car based on which lane it's in
+        self.dir = LANE_DIRS[self.lane]
 
+        # set the image of the car
         self.image = pygame.transform.scale(
-            self.game.spritesheet.get_image(13, 485, 125, 65), (100, 52))
+            self.game.spritesheet.get_image(13, 485, 125, 65), (77, 40))
+        # flip if moving left
+        if self.dir == -1:
+            self.image = pygame.transform.flip(self.image, True, False)
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.rect.centerx = -1 * TILESIZE
-        self.rect.centery = 10.5 * TILESIZE
-        self.speed = CAR_SPEED
+        
+        # Set start position based on direction
+        #   if moving right start left of screen
+        #   if moving left start right of screen
+        if self.dir == 1:
+            self.rect.centerx = -1 * TILESIZE
+        else:
+            self.rect.centerx = (WIDTH + 1) * TILESIZE      
+        self.rect.centery = self.lane * TILESIZE
+
+        # car's speed is multiplied by the dir (+1 for right, -1 for left)
+        self.speed = CAR_SPEED[lane] * self.dir
 
     def update(self):
         """Update car."""
+        # move the car by adding speed to its positions
         self.rect.x += self.speed
-        if self.rect.left > WIDTH:
+
+        # if car exits the screen, return it to original position
+        if self.dir == 1 and self.rect.left > WIDTH:
             self.rect.centerx = -1 * TILESIZE
-            self.rect.centery = 10.5 * TILESIZE
+        if self.dir == -1 and self.rect.right < 0:
+            self.rect.centerx = WIDTH + TILESIZE
 
 
 class Log(pygame.sprite.Sprite):

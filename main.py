@@ -73,7 +73,11 @@ class Game:
         for x in HOME_LOCATIONS:
             x = x * TILESIZE
             Home(self, x)
+
+        # spawn the cars
+        self.create_cars()
         self.player = Player(self)
+
 
     def run(self):
         """Game Loop - set self.playing = False to end the game."""
@@ -188,6 +192,23 @@ class Game:
                 if event.type == pygame.KEYUP:
                     waiting = False
 
+    def create_cars(self):
+        """Create all the cars."""
+        for lane in ROAD_LANES:
+            for car_num in range(CARS_PER_LANE[lane]):
+                self.create_car(car_num, lane)
+    
+    def create_car(self, car_num, lane):
+        """Create a single car and place in lane."""
+        car = Car(self, lane)
+        car_width = car.rect.width
+        # set spacing of cars
+        if car.dir == 1:
+            car.x = -(car_width + 3 * car_width * car_num)
+        else:
+            car.x = WIDTH + (car_width + 3 * car_width * car_num)
+        car.rect.centerx = car.x
+        car.rect.centery = int(lane * TILESIZE)
 
 # create the game object
 g = Game()

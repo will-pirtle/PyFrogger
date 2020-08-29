@@ -33,7 +33,23 @@ LANE_1 = 2.5
 LOG_LANES = [2.5, 4.5, 5.5]
 TURTLE_LANES = [3.5]
 ROAD_LANES = [7.5, 8.5, 9.5, 10.5]
+LANE_DIRS = {
+    7.5: -1,
+    8.5: 1,
+    9.5: -1,
+    10.5: 1,
+}
 
 # car settings
-CAR_SPEED = 2
-
+CAR_SPEED = {
+    7.5: 2,
+    8.5: 3,
+    9.5: 1,
+    10.5: 1,
+}
+CARS_PER_LANE = {
+    7.5: 2,
+    8.5: 1,
+    9.5: 2,
+    10.5: 3,
+}
