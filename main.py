@@ -78,7 +78,6 @@ class Game:
         self.create_cars()
         self.player = Player(self)
 
-
     def run(self):
         """Game Loop - set self.playing = False to end the game."""
         self.playing = True
@@ -204,9 +203,9 @@ class Game:
         car_width = car.rect.width
         # set spacing of cars
         if car.dir == 1:
-            car.x = -(car_width + 3 * car_width * car_num)
+            car.x = -(4 * car_width * car_num)
         else:
-            car.x = WIDTH + (car_width + 3 * car_width * car_num)
+            car.x = WIDTH + (car_width + 4 * car_width * car_num)
         car.rect.centerx = car.x
         car.rect.centery = int(lane * TILESIZE)
 

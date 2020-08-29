@@ -206,10 +206,18 @@ class Car(pygame.sprite.Sprite):
         self.lane = lane
         # set the direction of the car based on which lane it's in
         self.dir = LANE_DIRS[self.lane]
-
+        
         # set the image of the car
-        self.image = pygame.transform.scale(
-            self.game.spritesheet.get_image(13, 485, 125, 65), (77, 40))
+        self.load_images()
+        if self.lane == ROAD_LANES[0]:
+            self.image = self.car_imgs['car1']
+        elif self.lane == ROAD_LANES[1]:
+            self.image = self.truck_img
+        elif self.lane == ROAD_LANES[2]:
+            self.image = self.car_imgs['car3']
+        elif self.lane == ROAD_LANES[3]:
+            self.image = self.car_imgs['car2']
+        
         # flip if moving left
         if self.dir == -1:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -217,16 +225,29 @@ class Car(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         
         # Set start position based on direction
-        #   if moving right start left of screen
-        #   if moving left start right of screen
         if self.dir == 1:
+            # start left of screen
             self.rect.centerx = -1 * TILESIZE
         else:
+            #start right of screen
             self.rect.centerx = (WIDTH + 1) * TILESIZE      
         self.rect.centery = self.lane * TILESIZE
 
         # car's speed is multiplied by the dir (+1 for right, -1 for left)
         self.speed = CAR_SPEED[lane] * self.dir
+
+    def load_images(self):
+        """Load different types of car images."""
+        self.truck_img = pygame.transform.scale(
+            self.game.spritesheet.get_image(11, 408, 174, 63), (110, 40))
+        self.car_imgs = {
+            'car1': pygame.transform.scale(
+                self.game.spritesheet.get_image(13, 485, 125, 65), (77, 40)),
+            'car2': pygame.transform.scale(
+                self.game.spritesheet.get_image(157, 485, 132, 67), (79, 40)),
+            'car3': pygame.transform.scale(
+                self.game.spritesheet.get_image(306, 484, 132, 67), (79, 40)),
+        }
 
     def update(self):
         """Update car."""
