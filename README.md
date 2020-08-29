@@ -14,7 +14,7 @@ PyFrogger is a work in progress. Currently, the map is created and the player(fr
 
 #### Further Development Tasks:
  - [x] Add enemy cars
- - [] Add platform logs
- - [] Add platform/enemy aligators
- - [] Add scoreboard (timer, lives-count, score, etc.)
- - [] Add levels with increasing difficulty
+ - [ ] Add platform logs
+ - [ ] Add platform/enemy aligators
+ - [ ] Add scoreboard (timer, lives-count, score, etc.)
+ - [ ] Add levels with increasing difficulty
