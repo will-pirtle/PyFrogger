@@ -25,13 +25,10 @@ class Player(pygame.sprite.Sprite):
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-
+        
+        self.facing = 'up'
         # movement flags
         self.moving = False
-        self.facing_up = True
-        self.facing_down = False
-        self.facing_right = False
-        self.facing_left = False
 
         # animation variables
         self.current_frame = 0
@@ -39,12 +36,19 @@ class Player(pygame.sprite.Sprite):
 
         # load the initial image of frogger
         self.load_images()
-        self.image = self.up_frames[0]
+        if self.facing == 'up':
+            self.image = self.up_frames[0]
+        if self.facing == 'down':
+            self.image = self.down_frames[0]
+        if self.facing == 'right':
+            self.image = self.right_frames[0]
+        if self.facing == 'left':
+            self.image = self.left_frames[0]
         self.rect = self.image.get_rect()
 
         # starting position (bottom middle of screen)
-        self.x = 5
-        self.y = 11
+        self.x = (5.5) * TILESIZE
+        self.y = (11.5) * TILESIZE
 
         # life counter
         self.lives = 3
@@ -61,12 +65,6 @@ class Player(pygame.sprite.Sprite):
                                 self.game.spritesheet.get_image(113, 19, 56, 51),
                                 (51, 46)),
                             pygame.transform.scale(
-                                self.game.spritesheet.get_image(173, 9, 53, 64),
-                                (49, 59)),
-                            pygame.transform.scale(
-                                self.game.spritesheet.get_image(230, 2, 54, 73),
-                                (50, 68)),
-                            pygame.transform.scale(
                                 self.game.spritesheet.get_image(285, 20, 56, 51),
                                 (51, 46)),
                             ]
@@ -80,45 +78,20 @@ class Player(pygame.sprite.Sprite):
             self.right_frames.append(pygame.transform.rotate(frame, 90))
             self.left_frames.append(pygame.transform.rotate(frame, -90))
 
-    def move_left(self):
-        """Move Frogger one tile left"""
-        self.x += -1
-
-        # frogger faces left
-        self.facing_up = False
-        self.facing_down = False
-        self.facing_right = False
-        self.facing_left = True
-
-    def move_right(self):
-        """Move Frogger one tile right."""
-        self.x += 1
-
-        # frogger facing right
-        self.facing_up = False
-        self.facing_down = False
-        self.facing_right = True
-        self.facing_left = False
-
-    def move_up(self):
-        """Move Frogger one tile up."""
-        self.y += -1
-
-        # frogger facing up
-        self.facing_up = True
-        self.facing_down = False
-        self.facing_right = False
-        self.facing_left = False
-
-    def move_down(self):
+    def move(self, direction):
         """Move Frogger one tile down."""
-        self.y += 1
-        
-        # frogger facing down
-        self.facing_up = False
-        self.facing_down = True
-        self.facing_right = False
-        self.facing_left = False
+        if direction == 'down':
+            self.y += TILESIZE
+            self.facing = 'down'
+        if direction == 'up':
+            self.y -= TILESIZE
+            self.facing = 'up'
+        if direction == 'right':
+            self.x += TILESIZE
+            self.facing = 'right'
+        if direction == 'left':
+            self.x -= TILESIZE
+            self.facing = 'left'
 
     def animate(self):
         """Animate Frogger image."""
@@ -135,30 +108,26 @@ class Player(pygame.sprite.Sprite):
                     self.moving = False
                 
                 # change image based on direction of movement
-                if self.facing_up:
+                if self.facing == 'up':
                     self.image = self.up_frames[self.current_frame]
-                if self.facing_down:
+                if self.facing == 'down':
                     self.image = self.down_frames[self.current_frame]
-                if self.facing_right:
+                if self.facing == 'right':
                     self.image = self.right_frames[self.current_frame]
-                if self.facing_left:
+                if self.facing == 'left':
                     self.image = self.left_frames[self.current_frame]
                 self.rect = self.image.get_rect()
-        else:
-            # keep image facing direction of last movement
-            if self.facing_down:
-                self.image = self.down_frames[0]
-            if self.facing_up:
-                self.image = self.up_frames[0]
-            if self.facing_right:
-                self.image = self.right_frames[0]
-            if self.facing_left:
-                self.image = self.left_frames[0]
-            self.rect = self.image.get_rect()
 
     def in_bushes(self):
         """Frogger is in the top row of screen (whether in home or not)"""
         if self.rect.y < 1.5 * TILESIZE:
+            return True
+        else:
+            return False
+    
+    def in_water(self):
+        """Frogger is in the water (whether on log of not)"""
+        if self.rect.y < 5.5 * TILESIZE and self.rect.y > 1.5 * TILESIZE:
             return True
         else:
             return False
@@ -167,15 +136,14 @@ class Player(pygame.sprite.Sprite):
         """Return frogger back to starting position."""
         self.image = self.up_frames[0]
 
-        self.x = 5
-        self.y = 11
+        self.x = 5.5 * TILESIZE
+        self.y = 11.5 * TILESIZE
 
     def update(self):
         """Update the player."""
         self.animate()
-
-        self.rect.centerx = self.x * TILESIZE + 0.5 * TILESIZE
-        self.rect.centery = self.y * TILESIZE + 0.5 * TILESIZE
+        self.rect.centerx = self.x
+        self.rect.centery = self.y
 
 
 class Home(pygame.sprite.Sprite):
@@ -247,7 +215,7 @@ class Car(pygame.sprite.Sprite):
                 self.game.spritesheet.get_image(157, 485, 132, 67), (79, 40)),
             'car3': pygame.transform.scale(
                 self.game.spritesheet.get_image(306, 484, 132, 67), (79, 40)),
-        }
+            }
 
     def update(self):
         """Update car."""
@@ -261,35 +229,90 @@ class Car(pygame.sprite.Sprite):
             self.rect.centerx = WIDTH + TILESIZE
 
 
-class Log(pygame.sprite.Sprite):
+class Platform(pygame.sprite.Sprite):
     """Class to manage logs."""
     
-    def __init__(self, game):
+    def __init__(self, game, lane):
         """Initialize log attributes."""
-        self.groups = game.all_sprites, game.logs
+        self.groups = game.all_sprites, game.platforms
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-
-        self.type = 'md'
+        self.lane = lane
+        
+        self.dir = LANE_DIRS[self.lane]
 
         self.load_images()
-        self.image = self.log_imgs[self.type]
+        # water lane 3 will be turtle lane later
+        if self.lane == WATER_LANES[2]:
+            self.image = self.log_imgs['sm']
+        elif self.lane == WATER_LANES[0] or self.lane == WATER_LANES[3]:
+            self.image = self.log_imgs['sm']
+        elif self.lane == WATER_LANES[1]:
+            self.image = self.log_imgs['md']
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
 
-        self.rect.centerx = 0 - self.rect.width / 2
-        self.rect.centery = LOG_LANES[0]
+        self.current_frame = 0
+        self.last_update = 0
+
+        # Set start position based on direction
+        if self.dir == 1:
+            # start left of screen
+            self.rect.centerx = -1 * TILESIZE
+        else:
+            #start right of screen
+            self.rect.centerx = (WIDTH + 1) * TILESIZE      
+        self.rect.centery = self.lane * TILESIZE
+
+        # platform speed is multiplied by the dir (+1 for right, -1 for left)
+        self.speed = PLATFORM_SPEED[lane] * self.dir
 
     def load_images(self):
         """Load images for different types of logs."""
-        self.sm_img = pygame.transform.scale(
-            self.game.spritesheet.get_image(388, 258, 183, 58), (164, 52))
-        self.md_img = pygame.transform.scale(
-            self.game.spritesheet.get_image(15, 328, 270, 58), (242, 52))
-        self.log_imgs = {'sm': self.sm_img, 'md': self.md_img}
+        self.log_imgs = {
+            'sm': pygame.transform.scale(
+                self.game.spritesheet.get_image(388, 258, 183, 58), (126, 40)),
+            'md': pygame.transform.scale(
+                self.game.spritesheet.get_image(15, 328, 270, 58), (186, 40)),
+            }
+        self.turtle_imgs = {
+            'reg': [
+                pygame.transform.scale(
+                    self.game.spritesheet.get_image(404, 11, 69, 56), (42, 34)),
+                pygame.transform.scale(
+                    self.game.spritesheet.get_image(480, 10, 69, 59), (42, 36)),
+                pygame.transform.scale(
+                    self.game.spritesheet.get_image(8, 84, 69, 64), (42, 39)),
+                pygame.transform.scale(
+                    self.game.spritesheet.get_image(81, 83, 69, 66), (42, 40)),
+                pygame.transform.scale(
+                    self.game.spritesheet.get_image(154, 84, 69, 64), (42, 39)),
+                pygame.transform.scale(
+                    self.game.spritesheet.get_image(230, 90, 69, 54), (42, 33)),
+                ]
+            }
+    
+    def animate(self):
+        """Animate turtle images."""
+        now = pygame.time.get_ticks()
+
+        if now - self.last_update > 100:
+            self.last_update = now
+            self.current_frame += 1
+
+            if self.current_frame >= len(self.turtle_imgs['reg']):
+                self.current_frame = 0
+            
+            self.image = self.turtle_imgs['reg'][self.current_frame]
+            self.rect = self.image.get_rect()
 
     def update(self):
         """Update log."""
-        self.rect.x += 2
-        if self.rect.left > WIDTH:
-            self.rect.centerx = 0 - self.rect.width / 2
+        # move the platform by adding speed to its positions
+        self.rect.x += self.speed
+
+        # if platform exits the screen, return it to original position
+        if self.dir == 1 and self.rect.left > WIDTH:
+            self.rect.centerx = -1 * TILESIZE
+        if self.dir == -1 and self.rect.right < 0:
+            self.rect.centerx = WIDTH + TILESIZE

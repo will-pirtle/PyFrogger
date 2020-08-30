@@ -29,11 +29,13 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 HOME_LOCATIONS = [1.5, 3.5, 5.5, 7.5, 9.5]
 
 # define lanes
-LANE_1 = 2.5
-LOG_LANES = [2.5, 4.5, 5.5]
-TURTLE_LANES = [3.5]
+WATER_LANES = [5.5, 4.5, 3.5, 2.5]
 ROAD_LANES = [10.5, 9.5, 8.5, 7.5]
 LANE_DIRS = {
+    2.5: 1,
+    3.5: -1,
+    4.5: 1,
+    5.5: 1,
     7.5: -1,
     8.5: 1,
     9.5: -1,
@@ -52,4 +54,18 @@ CARS_PER_LANE = {
     8.5: 1,
     9.5: 2,
     10.5: 2,
+}
+
+# platform settings
+PLATFORM_SPEED = {
+    2.5: 1,
+    3.5: 2,
+    4.5: 2,
+    5.5: 1,
+}
+PLATFORMS_PER_LANE = {
+    2.5: 3,
+    3.5: 2,
+    4.5: 1,
+    5.5: 3,
 }

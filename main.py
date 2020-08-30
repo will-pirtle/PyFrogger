@@ -67,15 +67,16 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.homes = pygame.sprite.Group()
         self.cars = pygame.sprite.Group()
-        self.logs = pygame.sprite.Group()
+        self.platforms = pygame.sprite.Group()
 
         # place homes and players
         for x in HOME_LOCATIONS:
             x = x * TILESIZE
             Home(self, x)
 
-        # spawn the cars
+        # spawn the cars, platforms, and player
         self.create_cars()
+        self.create_platforms()
         self.player = Player(self)
 
     def run(self):
@@ -101,19 +102,38 @@ class Game:
         for arrival in arrivals:
             self.player.reset_pos()
             self.map_img.blit(
-                self.player.down_frames[0], (arrival.rect.centerx - 26, arrival.rect.centery - 18))
+                self.player.down_frames[0], (arrival.rect.centerx - 26, 
+                arrival.rect.centery - 18))
 
-        # frog hits bush
+        # frogger hits bush
         if self.player.in_bushes() and not arrivals:
             self.player.reset_pos()
             self.player.lives -= 1
 
+        # frogger hits car
         if pygame.sprite.spritecollideany(self.player, self.cars):
             self.player.reset_pos()
             self.player.lives -= 1
+        
+        # frogger rides platform
+        rides = pygame.sprite.spritecollide(self.player, self.platforms, False)
+        for ride in rides:
+            self.player.x += ride.speed / len(rides)
+        
+        # frogger in water
+        if self.player.in_water() and not rides:
+            self.player.reset_pos()
+            self.player.lives -= 1
 
+        # next level if all homes filled
+        if not self.homes:
+            # for now just end game
+            self.playing = False
+
+        # frogger runs out of lives
         if self.player.lives == 0:
             self.playing = False
+
 
     def draw(self):
         """Game Loop - draw"""
@@ -137,18 +157,18 @@ class Game:
                     self.quit()
                 if event.key == pygame.K_LEFT:
                     if self.player.rect.left - TILESIZE >= 0:
-                        self.player.move_left()
+                        self.player.move('left')
                         self.player.moving = True
                 if event.key == pygame.K_RIGHT:
                     if self.player.rect.right + TILESIZE <= WIDTH:
-                        self.player.move_right()
+                        self.player.move('right')
                         self.player.moving = True
                 if event.key == pygame.K_DOWN:
                     if self.player.rect.bottom + TILESIZE <= HEIGHT - TILESIZE:
-                        self.player.move_down()
+                        self.player.move('down')
                         self.player.moving = True
                 if event.key == pygame.K_UP:
-                    self.player.move_up()
+                    self.player.move('up')
                     self.player.moving = True
 
     def show_start_screen(self):
@@ -208,6 +228,24 @@ class Game:
             car.x = WIDTH + (car_width + 4 * car_width * car_num)
         car.rect.centerx = car.x
         car.rect.centery = int(lane * TILESIZE)
+
+    def create_platforms(self):
+        """Create all the cars."""
+        for lane in WATER_LANES:
+            for platform_num in range(PLATFORMS_PER_LANE[lane]):
+                self.create_platform(platform_num, lane)
+    
+    def create_platform(self, platform_num, lane):
+        """Create a single car and place in lane."""
+        platform = Platform(self, lane)
+        platform_width = platform.rect.width
+        # set spacing of platforms
+        if platform.dir == 1:
+            platform.x = -(2 * platform_width * platform_num)
+        else:
+            platform.x = WIDTH + (2 * platform_width * platform_num)
+        platform.rect.centerx = platform.x
+        platform.rect.centery = int(lane * TILESIZE)
 
 # create the game object
 g = Game()
