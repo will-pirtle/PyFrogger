@@ -44,8 +44,8 @@ LANE_DIRS = {
 
 # car settings
 CAR_SPEED = {
-    7.5: 2,
-    8.5: 3,
+    7.5: 1.5,
+    8.5: 2.5,
     9.5: 1,
     10.5: 1,
 }
@@ -58,13 +58,13 @@ CARS_PER_LANE = {
 
 # platform settings
 PLATFORM_SPEED = {
-    2.5: 1,
+    2.5: 1.5,
     3.5: 2,
     4.5: 2,
     5.5: 1,
 }
 PLATFORMS_PER_LANE = {
-    2.5: 3,
+    2.5: 2,
     3.5: 2,
     4.5: 1,
     5.5: 3,

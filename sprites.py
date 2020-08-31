@@ -26,8 +26,8 @@ class Player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         
-        self.facing = 'up'
         # movement flags
+        self.facing = 'up'
         self.moving = False
 
         # animation variables
@@ -172,8 +172,6 @@ class Car(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.lane = lane
-        # set the direction of the car based on which lane it's in
-        self.dir = LANE_DIRS[self.lane]
         
         # set the image of the car
         self.load_images()
@@ -186,6 +184,9 @@ class Car(pygame.sprite.Sprite):
         elif self.lane == ROAD_LANES[3]:
             self.image = self.car_imgs['car2']
         
+        # set the direction of the car based on which lane it's in
+        self.dir = LANE_DIRS[self.lane]
+        
         # flip if moving left
         if self.dir == -1:
             self.image = pygame.transform.flip(self.image, True, False)
@@ -195,14 +196,17 @@ class Car(pygame.sprite.Sprite):
         # Set start position based on direction
         if self.dir == 1:
             # start left of screen
-            self.rect.centerx = -1 * TILESIZE
+            self.rect.x = -(self.rect.width)
         else:
             #start right of screen
-            self.rect.centerx = (WIDTH + 1) * TILESIZE      
+            self.rect.x = WIDTH     
         self.rect.centery = self.lane * TILESIZE
 
         # car's speed is multiplied by the dir (+1 for right, -1 for left)
         self.speed = CAR_SPEED[lane] * self.dir
+
+        # store the exact x location
+        self.x = float(self.rect.x)
 
     def load_images(self):
         """Load different types of car images."""
@@ -219,14 +223,15 @@ class Car(pygame.sprite.Sprite):
 
     def update(self):
         """Update car."""
-        # move the car by adding speed to its positions
-        self.rect.x += self.speed
-
         # if car exits the screen, return it to original position
         if self.dir == 1 and self.rect.left > WIDTH:
-            self.rect.centerx = -1 * TILESIZE
+            self.x = -(self.rect.width)
         if self.dir == -1 and self.rect.right < 0:
-            self.rect.centerx = WIDTH + TILESIZE
+            self.x = WIDTH
+        
+        # move the car by adding speed to its positions
+        self.x += self.speed
+        self.rect.x = self.x
 
 
 class Platform(pygame.sprite.Sprite):
@@ -238,81 +243,93 @@ class Platform(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.lane = lane
-        
-        self.dir = LANE_DIRS[self.lane]
 
+        # set animation counters
+        self.current_frame = 0
+        self.last_update = 0
+        
+        # set the image of the platform
         self.load_images()
         # water lane 3 will be turtle lane later
         if self.lane == WATER_LANES[2]:
-            self.image = self.log_imgs['sm']
+            self.image = self.turtle_frames[0]
         elif self.lane == WATER_LANES[0] or self.lane == WATER_LANES[3]:
             self.image = self.log_imgs['sm']
         elif self.lane == WATER_LANES[1]:
             self.image = self.log_imgs['md']
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-
-        self.current_frame = 0
-        self.last_update = 0
-
+        
+        # set direction based on lane
+        self.dir = LANE_DIRS[self.lane]
+        
         # Set start position based on direction
         if self.dir == 1:
             # start left of screen
-            self.rect.centerx = -1 * TILESIZE
+            self.rect.x = -self.rect.width
         else:
             #start right of screen
-            self.rect.centerx = (WIDTH + 1) * TILESIZE      
+            self.rect.x = WIDTH     
         self.rect.centery = self.lane * TILESIZE
 
         # platform speed is multiplied by the dir (+1 for right, -1 for left)
         self.speed = PLATFORM_SPEED[lane] * self.dir
 
+        # store the exact x location
+        self.x = float(self.rect.x)
+
     def load_images(self):
         """Load images for different types of logs."""
+        # list of log imgs
         self.log_imgs = {
             'sm': pygame.transform.scale(
                 self.game.spritesheet.get_image(388, 258, 183, 58), (126, 40)),
             'md': pygame.transform.scale(
                 self.game.spritesheet.get_image(15, 328, 270, 58), (186, 40)),
             }
-        self.turtle_imgs = {
-            'reg': [
+        # list of turtle imgs
+        self.turtle_frames = [
+            pygame.transform.flip(
                 pygame.transform.scale(
-                    self.game.spritesheet.get_image(404, 11, 69, 56), (42, 34)),
+                    pygame.image.load("images/turtles1.png"), (174, 47)), 
+                    True, False),
+            pygame.transform.flip(
                 pygame.transform.scale(
-                    self.game.spritesheet.get_image(480, 10, 69, 59), (42, 36)),
+                    pygame.image.load("images/turtles2.png"), (174, 50)),
+                    True, False),
+            pygame.transform.flip(
                 pygame.transform.scale(
-                    self.game.spritesheet.get_image(8, 84, 69, 64), (42, 39)),
-                pygame.transform.scale(
-                    self.game.spritesheet.get_image(81, 83, 69, 66), (42, 40)),
-                pygame.transform.scale(
-                    self.game.spritesheet.get_image(154, 84, 69, 64), (42, 39)),
-                pygame.transform.scale(
-                    self.game.spritesheet.get_image(230, 90, 69, 54), (42, 33)),
-                ]
-            }
+                    pygame.image.load("images/turtles3.png"), (174, 55)),
+                    True, False),
+            ]
     
     def animate(self):
         """Animate turtle images."""
         now = pygame.time.get_ticks()
 
-        if now - self.last_update > 100:
+        if now - self.last_update > 240:
             self.last_update = now
             self.current_frame += 1
 
-            if self.current_frame >= len(self.turtle_imgs['reg']):
+            if self.current_frame >= len(self.turtle_frames):
                 self.current_frame = 0
             
-            self.image = self.turtle_imgs['reg'][self.current_frame]
+            self.image = self.turtle_frames[self.current_frame]
             self.rect = self.image.get_rect()
 
     def update(self):
         """Update log."""
-        # move the platform by adding speed to its positions
-        self.rect.x += self.speed
+        # animate turtles
+        if self.lane == WATER_LANES[2]:
+            self.animate()
 
         # if platform exits the screen, return it to original position
         if self.dir == 1 and self.rect.left > WIDTH:
-            self.rect.centerx = -1 * TILESIZE
+            self.x = -(self.rect.width)
         if self.dir == -1 and self.rect.right < 0:
-            self.rect.centerx = WIDTH + TILESIZE
+            self.x = WIDTH
+        
+        # move the platform by adding speed to its positions
+        self.x += self.speed
+        self.rect.x = self.x
+        self.rect.centery = self.lane * TILESIZE

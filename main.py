@@ -221,13 +221,13 @@ class Game:
         """Create a single car and place in lane."""
         car = Car(self, lane)
         car_width = car.rect.width
-        # set spacing of cars
+        
+        # set spacing of car
         if car.dir == 1:
-            car.x = -(4 * car_width * car_num)
+            car.x = -(car_width + (WIDTH / CARS_PER_LANE[lane]) * car_num)
         else:
-            car.x = WIDTH + (car_width + 4 * car_width * car_num)
-        car.rect.centerx = car.x
-        car.rect.centery = int(lane * TILESIZE)
+            car.x = WIDTH + ((WIDTH / CARS_PER_LANE[lane]) * car_num)
+        car.rect.x = car.x
 
     def create_platforms(self):
         """Create all the cars."""
@@ -239,13 +239,14 @@ class Game:
         """Create a single car and place in lane."""
         platform = Platform(self, lane)
         platform_width = platform.rect.width
+
         # set spacing of platforms
         if platform.dir == 1:
-            platform.x = -(2 * platform_width * platform_num)
+            platform.x = -(platform_width + (WIDTH / PLATFORMS_PER_LANE[lane]) * platform_num)
         else:
-            platform.x = WIDTH + (2 * platform_width * platform_num)
-        platform.rect.centerx = platform.x
-        platform.rect.centery = int(lane * TILESIZE)
+            platform.x = WIDTH + ((WIDTH / PLATFORMS_PER_LANE[lane]) * platform_num)
+        platform.rect.x = platform.x
+
 
 # create the game object
 g = Game()
