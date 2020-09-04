@@ -13,7 +13,7 @@ BROWN = (106, 55, 5)
 CYAN = (0, 255, 255)
 
 # game settings
-TITLE = 'FROGGER'
+TITLE = 'PyFrogger'
 WIDTH = 660
 HEIGHT = 780
 FPS = 60

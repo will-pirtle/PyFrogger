@@ -235,7 +235,7 @@ class Car(pygame.sprite.Sprite):
 
 
 class Platform(pygame.sprite.Sprite):
-    """Class to manage logs."""
+    """Class to manage logs and turtles."""
     
     def __init__(self, game, lane):
         """Initialize log attributes."""
@@ -291,15 +291,15 @@ class Platform(pygame.sprite.Sprite):
         self.turtle_frames = [
             pygame.transform.flip(
                 pygame.transform.scale(
-                    pygame.image.load("images/turtles1.png"), (174, 47)), 
+                    pygame.image.load("images/turtles1.png"), (148, 40)), 
                     True, False),
             pygame.transform.flip(
                 pygame.transform.scale(
-                    pygame.image.load("images/turtles2.png"), (174, 50)),
+                    pygame.image.load("images/turtles2.png"), (148, 43)),
                     True, False),
             pygame.transform.flip(
                 pygame.transform.scale(
-                    pygame.image.load("images/turtles3.png"), (174, 55)),
+                    pygame.image.load("images/turtles3.png"), (148, 47)),
                     True, False),
             ]
     

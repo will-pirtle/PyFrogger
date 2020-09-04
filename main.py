@@ -17,34 +17,6 @@ class Game:
         self.clock = pygame.time.Clock()
         self.load_data()
 
-    def draw_text(self, text, font_name, size, color, x, y, align="nw"):
-        """Function to draw text to the screen."""
-        font = pygame.font.Font(font_name, size)
-        text_surface = font.render(text, True, color)
-        text_rect = text_surface.get_rect()
-        
-        # Alignment attribute is point of text-rect to align
-        if align == "nw":
-            text_rect.topleft = (x, y)
-        if align == "ne":
-            text_rect.topright = (x, y)
-        if align == "sw":
-            text_rect.bottomleft = (x, y)
-        if align == "se":
-            text_rect.bottomright = (x, y)
-        if align == "n":
-            text_rect.midtop = (x, y)
-        if align == "s":
-            text_rect.midbottom = (x, y)
-        if align == "e":
-            text_rect.midright = (x, y)
-        if align == "w":
-            text_rect.midleft = (x, y)
-        if align == "center":
-            text_rect.center = (x, y)
-
-        self.screen.blit(text_surface, text_rect)
-
     def load_data(self):
         """Load all game data."""
         game_folder = path.dirname(__file__)
@@ -80,7 +52,7 @@ class Game:
         self.player = Player(self)
 
     def run(self):
-        """Game Loop - set self.playing = False to end the game."""
+        """Game Loop **set self.playing = False to end the game**"""
         self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
@@ -88,13 +60,8 @@ class Game:
             self.update()
             self.draw()
 
-    def quit(self):
-        """Function to quit game."""
-        pygame.quit()
-        sys.exit()
-
     def update(self):
-        """Update portion of the game loop."""
+        """Game Loop - Update"""
         self.all_sprites.update()
 
         # frog reaches home
@@ -136,7 +103,7 @@ class Game:
 
 
     def draw(self):
-        """Game Loop - draw"""
+        """Game Loop - Draw"""
         # v DURING DEVELOPMENT: keep track of performance with fps! v
         #pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
 
@@ -148,7 +115,7 @@ class Game:
         pygame.display.flip()
 
     def events(self):
-        """Catch all events here."""
+        """Game Loop - Events"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit()
@@ -171,46 +138,7 @@ class Game:
                     self.player.move('up')
                     self.player.moving = True
 
-    def show_start_screen(self):
-        """Show the Start screen."""
-        self.screen.fill(BLACK)
-        self.draw_text("FROGGER", self.title_font, 105, GREEN,
-                       int(WIDTH / 2), int(HEIGHT / 3), align="center")
-        self.draw_text("Press any button to start", self.title_font, 40, WHITE,
-                       int(WIDTH / 2), int(HEIGHT / 2), align="center")
-
-        pygame.display.flip()
-        self.wait_for_key()
-
-    def show_go_screen(self):
-        """Display the Game Over screen."""
-        self.screen.fill(BLACK)
-        self.draw_text("GAME OVER", self.title_font, 105, GREEN,
-                       int(WIDTH / 2), int(HEIGHT / 3), align="center")
-        self.draw_text("Press any button to restart", self.title_font, 40, WHITE,
-                       int(WIDTH / 2), int(HEIGHT / 2), align="center")
-        self.draw_text("Press 'ESC' to quit", self.title_font, 40, WHITE,
-                       int(WIDTH / 2), int((HEIGHT / 2) + 60), align="center")
-
-        pygame.display.flip()
-        self.wait_for_key()
-
-    def wait_for_key(self):
-        """Wait for keys while on start and g.o. screens."""
-        pygame.event.wait()
-        waiting = True
-        while waiting:
-            self.clock.tick(FPS)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    waiting = False
-                    self.quit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.quit()
-                if event.type == pygame.KEYUP:
-                    waiting = False
-
+## HELPER FUNCTIONS ##
     def create_cars(self):
         """Create all the cars."""
         for lane in ROAD_LANES:
@@ -246,6 +174,79 @@ class Game:
         else:
             platform.x = WIDTH + ((WIDTH / PLATFORMS_PER_LANE[lane]) * platform_num)
         platform.rect.x = platform.x
+
+    def draw_text(self, text, font_name, size, color, x, y, align="nw"):
+        """Function to draw text to the screen."""
+        font = pygame.font.Font(font_name, size)
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        
+        # Alignment attribute is point of text-rect to align
+        if align == "nw":
+            text_rect.topleft = (x, y)
+        if align == "ne":
+            text_rect.topright = (x, y)
+        if align == "sw":
+            text_rect.bottomleft = (x, y)
+        if align == "se":
+            text_rect.bottomright = (x, y)
+        if align == "n":
+            text_rect.midtop = (x, y)
+        if align == "s":
+            text_rect.midbottom = (x, y)
+        if align == "e":
+            text_rect.midright = (x, y)
+        if align == "w":
+            text_rect.midleft = (x, y)
+        if align == "center":
+            text_rect.center = (x, y)
+
+        self.screen.blit(text_surface, text_rect)
+
+    def show_start_screen(self):
+        """Show the Start screen."""
+        self.screen.fill(BLACK)
+        self.draw_text(f"{TITLE}", self.title_font, 105, GREEN,
+                       int(WIDTH / 2), int(HEIGHT / 3), align="center")
+        self.draw_text("Press any button to start", self.title_font, 40, WHITE,
+                       int(WIDTH / 2), int(HEIGHT / 2), align="center")
+
+        pygame.display.flip()
+        self.wait_for_key()
+
+    def show_go_screen(self):
+        """Display the Game Over screen."""
+        self.screen.fill(BLACK)
+        self.draw_text("GAME OVER", self.title_font, 105, GREEN,
+                       int(WIDTH / 2), int(HEIGHT / 3), align="center")
+        self.draw_text("Press any button to restart", self.title_font, 40, WHITE,
+                       int(WIDTH / 2), int(HEIGHT / 2), align="center")
+        self.draw_text("Press 'ESC' to quit", self.title_font, 40, WHITE,
+                       int(WIDTH / 2), int((HEIGHT / 2) + 60), align="center")
+
+        pygame.display.flip()
+        self.wait_for_key()
+
+    def wait_for_key(self):
+        """Wait for keys while on start and g.o. screens."""
+        pygame.event.wait()
+        waiting = True
+        while waiting:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    waiting = False
+                    self.quit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.quit()
+                if event.type == pygame.KEYUP:
+                    waiting = False
+    
+    def quit(self):
+        """Function to quit game."""
+        pygame.quit()
+        sys.exit()
 
 
 # create the game object
